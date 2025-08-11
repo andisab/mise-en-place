@@ -1,0 +1,290 @@
+
+############################################################################
+# NAVIGATION ALIASES
+############################################################################
+alias ..="cd .."
+alias ...="cd ../.."
+alias ....="cd ../../.."
+alias .....="cd ../../../.."
+# alias ls="ls -G"
+# alias ll="ls -lahG"
+
+alias ls='eza'
+alias cat='bat'
+alias ff='fd'  # fast find - doesn't override system find
+alias trash='mv "$@" ~/.Trash/'
+
+# PYTHON ALIASES
+alias venv='uv venv'
+alias va='source .venv/bin/activate'
+alias vd='deactivate'
+alias pip='uv pip'
+
+# COMMON DIRECTORY ALIASES
+alias dnld="cd ~/Downloads"
+alias dstp="cd ~/Desktop"
+alias docs="cd ~/Documents"
+alias proj="cd ~/Projects"
+
+# OTHER CUSTOM COMMANDS
+alias rr='ssh -o HostKeyAlgorithms=+ssh-rsa -o PubkeyAcceptedAlgorithms=+ssh-rsa -i ~/.ssh/rr ablukis@205.186.154.174'
+# alias rr='ssh ablukis@205.186.154.174 -i ~/.ssh/rr'
+alias rr2='ssh root@205.186.152.194 -oHostKeyAlgorithms=+ssh-rsa -i ~/.ssh/rr'
+alias py='/usr/bin/python3'
+alias python='/usr/bin/python3'
+alias sesh='load -S Session.vim'
+
+
+# APACHE ALIASES
+alias webRoot='cd /var/www/vhosts/'
+alias apacheConf='cd /etc/httpd/vhosts.d'
+alias bounceDB='sudo /etc/init.d/mysqld restart'
+alias bounceApache='sudo apachectl -k graceful'
+alias errLogs='sudo tail -f /var/log/httpd/error_log'
+alias devLogs='sudo tail -f /var/log/httpd/error_log_ablukis_rr_lv.log'
+alias webLogs='sudo tail -f /var/log/httpd/access_log'
+alias db='mysql -u admin -p'
+alias dbadmin='mysqladmin -u admin'
+alias topTen='du -ak / | sort -n -r | head -n 10'
+
+
+############################################################################
+# SHELL ENVIRONMENT SETTINGS
+############################################################################
+
+# FZF configuration
+export FZF_DEFAULT_COMMAND='fd --type f --hidden --follow --exclude .git'
+export FZF_DEFAULT_OPTS="
+    --height 40%
+    --layout=reverse
+    --border
+    --inline-info
+    --color=bg+:#3c3836,bg:#282828,spinner:#fb4934,hl:#928374,fg:#ebdbb2,header:#928374,info:#8ec07c,pointer:#fb4934,marker:#fb4934,fg+:#ebdbb2,prompt:#fb4934,hl+:#fb4934
+"
+# Use fd for CTRL-T
+export FZF_CTRL_T_COMMAND="$FZF_DEFAULT_COMMAND"
+# Use fd for ALT-C
+export FZF_ALT_C_COMMAND="fd --type d --hidden --follow --exclude .git"
+
+
+# HELPER FUNCTIONS
+# Function to safely add to PATH
+add_to_path() {
+    if [[ -d "$1" ]] && [[ ":$PATH:" != *":$1:"* ]]; then
+        export PATH="$1:$PATH"
+    fi
+}
+
+# Function to safely source files
+safe_source() {
+    if [[ -f "$1" ]]; then
+        source "$1"
+        return 0
+    else
+        return 1
+    fi
+}
+
+# Function to detect OS and architecture
+detect_platform() {
+    case "$(uname -s)" in
+        Darwin*)    OS="macOS";;
+        Linux*)     OS="Linux";;
+        *)          OS="Unknown";;
+    esac
+    
+    case "$(uname -m)" in
+        arm64|aarch64)  ARCH="ARM64";;
+        x86_64)         ARCH="x86_64";;
+        *)              ARCH="Unknown";;
+    esac
+    
+    export OS ARCH
+}
+
+
+############################################################################
+# GIT ALIASES
+# Partly imported from: https://gist.github.com/colmarius/6c927994f0de197cf4ea
+############################################################################
+
+alias g="git"
+alias ga='git add -A'
+alias grm='git remove'
+alias gcm='git commit -v --amend'
+alias gup='git pull'
+alias gco='git checkout'
+alias gcl='git clone'
+alias gb='git branch -v'
+alias gf='git fetch'
+alias gst='git stash'
+alias gstp='git stash pop'
+alias gchp='git cherry-pick'
+
+alias gs="git status"
+alias grv='git remote -v'
+alias glog='git log --date-order --pretty="format:%C(yellow)%h%Cblue%d%Creset %s %C(white) %an, %ar%Creset" --graph'
+alias glogg='glog --all'
+
+alias gd='git diff -M'
+alias gd.='git diff -M --color-words="."'
+alias gdc='git diff --cached -M'
+alias gdc.='git diff --cached -M --color-words="."'
+alias gsh='git show'
+alias gsh.='git show --color-words="."'
+
+alias gp='git push'
+alias gpthis='git push origin $(git_current_branch)'
+alias gpthis!='git push --set-upstream origin $(git_current_branch)'
+
+alias gm='git merge --no-ff'
+alias gmf='git merge --ff-only'
+alias grb='git rebase -p'
+alias grba='git rebase --abort'
+alias grbc='git rebase --continue'
+alias grbi='git rebase -i'
+alias gr='git reset'
+alias grh='git reset --hard'
+alias grsh='git reset --soft HEAD~'
+
+
+# HELPER FUNCTIONS
+git_current_branch() {
+  cat "$(git rev-parse --git-dir 2>/dev/null)/HEAD" | sed -e 's/^.*refs\/heads\///'
+}
+
+# Git branch cleanup - remove merged branches
+git_cleanup_branches() {
+    echo "Branches merged into main/master:"
+    git branch --merged | grep -v '\*\|main\|master' 
+    echo -n "Delete these branches? [y/N] "
+    read response
+    if [[ "$response" =~ ^[Yy]$ ]]; then
+        git branch --merged | grep -v '\*\|main\|master' | xargs -n 1 git branch -d
+    fi
+}
+
+
+
+############################################################################
+# DOCKER COMMANDS
+# https://gist.github.com/jgrodziski/9ed4a17709baad10dbcd4530b60dfcbb      #
+#                                                                          #
+#               ------- Useful Docker Aliases --------                     #
+#                                                                          #
+#     # Installation :                                                     #
+#     copy/paste these lines into your .bashrc or .zshrc file or just      #
+#     type the following in your current shell to try it out:              #
+#     wget -O - https://gist.githubusercontent.com/jgrodziski/9ed4a17709baad10dbcd4530b60dfcbb/raw/d84ef1741c59e7ab07fb055a70df1830584c6c18/docker-aliases.sh | bash
+#                                                                          #
+#     # Usage:                                                             #
+#     daws <svc> <cmd> <opts> : aws cli in docker with <svc> <cmd> <opts>  #
+#     dc             : docker compose                                      #
+#     dcu            : docker compose up -d                                #
+#     dcd            : docker compose down                                 #
+#     dcr            : docker compose run                                  #
+#     dex <container>: execute a bash shell inside the RUNNING <container> #
+#     di <container> : docker inspect <container>                          #
+#     dim            : docker images                                       #
+#     dip            : IP addresses of all running containers              #
+#     dl <container> : docker logs -f <container>                          #
+#     dnames         : names of all running containers                     #
+#     dps            : docker ps                                           #
+#     dpsa           : docker ps -a                                        #
+#     drmc           : remove all exited containers                        #
+#     drmid          : remove all dangling images                          #
+#     drun <image>   : execute a bash shell in NEW container from <image>  #
+#     dsr <container>: stop then remove <container>                        #
+#                                                                          #
+############################################################################
+
+
+dnames-fn() {
+	for ID in `docker ps | awk '{print $1}' | grep -v 'CONTAINER'`
+	do
+    	docker inspect $ID | grep Name | head -1 | awk '{print $2}' | sed 's/,//g' | sed 's%/%%g' | sed 's/"//g'
+	done
+}
+
+dip-fn() {
+    echo "IP addresses of all named running containers"
+
+    for DOC in `dnames-fn`
+    do
+        IP=`docker inspect --format='{{range .NetworkSettings.Networks}}{{.IPAddress}} {{end}}' "$DOC"`
+        OUT+=$DOC'\t'$IP'\n'
+    done
+    echo -e $OUT | column -t
+    unset OUT
+}
+
+dex-fn() {
+	docker exec -it $1 ${2:-bash}
+}
+
+di-fn() {
+	docker inspect $1
+}
+
+dl-fn() {
+	docker logs -f $1
+}
+
+drun-fn() {
+	docker run -it $1 $2
+}
+
+dcr-fn() {
+	docker compose run $@
+}
+
+dsr-fn() {
+	docker stop $1;docker rm $1
+}
+
+drmc-fn() {
+       docker rm $(docker ps --all -q -f status=exited)
+}
+
+drmid-fn() {
+       imgs=$(docker images -q -f dangling=true)
+       [ ! -z "$imgs" ] && docker rmi "$imgs" || echo "no dangling images."
+}
+
+# in order to do things like dex $(dlab label) sh
+dlab() {
+       docker ps --filter="label=$1" --format="{{.ID}}"
+}
+
+dc-fn() {
+        docker compose $*
+}
+
+d-aws-cli-fn() {
+    docker run \
+           -e AWS_ACCESS_KEY_ID=$AWS_ACCESS_KEY_ID \
+           -e AWS_DEFAULT_REGION=$AWS_DEFAULT_REGION \
+           -e AWS_SECRET_ACCESS_KEY=$AWS_SECRET_ACCESS_KEY \
+           amazon/aws-cli:latest $1 $2 $3
+}
+
+alias daws=d-aws-cli-fn
+alias dc=dc-fn
+alias dcu="docker compose up -d"
+alias dcd="docker compose down"
+alias dcr=dcr-fn
+alias dex=dex-fn
+alias di=di-fn
+alias dim="docker images"
+alias dip=dip-fn
+alias dl=dl-fn
+alias dnames=dnames-fn
+alias dps="docker ps"
+alias dpsa="docker ps -a"
+alias drmc=drmc-fn
+alias drmid=drmid-fn
+alias drun=drun-fn
+alias dsp="docker system prune --all"
+alias dsr=dsr-fn
+
+. "$HOME/.local/bin/env"

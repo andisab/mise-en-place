@@ -1,0 +1,70 @@
+.DS_Store
+*.swp
+.config/iterm2/AppSupport
+.config/nvim/lazy-lock.json
+Session*vim
+.vim/.netrwhist
+.vim/undodir*
+.vim/session*
+.vim/Session*
+.zsh/zsh-autocomplete*
+
+# Compiled Lua sources
+luac.out
+
+# luarocks build files
+*.src.rock
+*.zip
+*.tar.gz
+
+# Object files
+*.o
+*.os
+*.ko
+*.obj
+*.elf
+
+# Precompiled Headers
+*.gch
+*.pch
+
+# Libraries
+*.lib
+*.a
+*.la
+*.lo
+*.def
+*.exp
+
+# Shared objects (inc. Windows DLLs)
+*.dll
+*.so
+*.so.*
+*.dylib
+
+# Executables
+*.exe
+*.out
+*.app
+*.i*86
+*.x86_64
+*.hex
+
+# Claude Desktop configuration
+# Generated config with actual API keys
+llm/claude_desktop/claude_desktop_config.json
+# User's secrets file (never commit this!)
+.claude_secrets
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.pyc
+.pytest_cache/
+
+# Test files
+test_config_simple.py
+run_tests.py
+test_all_modes.sh
+
