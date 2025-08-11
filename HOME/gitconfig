@@ -1,0 +1,17 @@
+[user]
+    name = Your Name
+    email = your.email@example.com
+[merge]
+    tool = opendiff
+[color]
+    ui = true
+[push]
+    default = simple
+[branch]
+    autosetuprebase = always
+[core]
+    precomposeunicode = true
+    editor = vim
+    autocrlf = input
+[credential]
+    helper = osxkeychain

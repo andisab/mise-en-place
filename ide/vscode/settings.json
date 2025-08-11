@@ -1,0 +1,6 @@
+{
+  "git.autofetch": true,
+  "editor.cursorSurroundingLines": 8,
+  "git.confirmSync": false,
+  "vim.smartRelativeLine": true
+}

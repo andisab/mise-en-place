@@ -1,0 +1,302 @@
+#!/usr/bin/env zsh
+
+# LOAD PERSONALIZED SETTINGS OR THROW ERROR...
+source ~/.profile
+
+# Load Install tools from mise-en-place Repository, if it exists
+if [[ -f ~/Projects/mise-en-place/install.sh ]]; then
+    source ~/Projects/mise-en-place/install.sh
+fi
+
+# Detect Homebrew location (M1/M2 vs Intel Macs)
+if [[ -f /opt/homebrew/bin/brew ]]; then
+    BREW_PREFIX="/opt/homebrew"
+elif [[ -f /usr/local/bin/brew ]]; then
+    BREW_PREFIX="/usr/local"
+else
+    BREW_PREFIX=$(brew --prefix 2>/dev/null || echo "/usr/local")
+fi
+
+################################################################
+# SHELL SETTINGS
+################################################################
+
+# Vim style key bindings in the shell... 
+bindkey -v 
+# Other shell preferences... 
+# Environment variables moved to ~/.profile
+# GREP_OPTIONS is deprecated, use alias instead
+alias grep='grep --color=auto'
+
+# History configuration
+export HISTFILE="$HOME/.zsh_history"
+export HISTSIZE=100000
+export SAVEHIST=100000
+
+# Useful ZSH options
+setopt SHARE_HISTORY          # Share history between all sessions
+setopt HIST_EXPIRE_DUPS_FIRST # Expire duplicate entries first when trimming history
+setopt HIST_IGNORE_DUPS       # Don't record an entry that was just recorded again
+setopt HIST_IGNORE_ALL_DUPS   # Delete old recorded entry if new entry is a duplicate
+setopt HIST_FIND_NO_DUPS      # Do not display a line previously found
+setopt HIST_IGNORE_SPACE      # Don't record an entry starting with a space
+setopt HIST_SAVE_NO_DUPS      # Don't write duplicate entries in the history file
+setopt HIST_REDUCE_BLANKS     # Remove superfluous blanks before recording entry
+setopt HIST_VERIFY            # Don't execute immediately upon history expansion
+setopt EXTENDED_HISTORY       # Write the history file in the ":start:elapsed;command" format
+
+# CLI PROMPT CUSTOMIZATION
+# See https://zsh.sourceforge.io/Doc/Release/Prompt-Expansion.html for further details
+# Color chart: https://upload.wikimedia.org/wikipedia/commons/1/15/Xterm_256color_chart.svg
+# Gruvbox color scheme: https://github.com/morhetz/gruvbox
+#
+# CUSTOMIZED PROMPT: 
+# Load Git version control information
+autoload -Uz vcs_info
+precmd() { vcs_info }
+# Format the vcs_info_msg_0_ variable
+zstyle ':vcs_info:git:*' formats 'on %b'
+# Original prompt: PROMPT="%n@%m %1~ %#"
+setopt PROMPT_SUBST
+PROMPT='%U%F{167}%n%f%u(%m)@%F{229}${PWD/#$HOME/~}%f %F{172}${vcs_info_msg_0_}%f%#'
+
+################################################################
+# ZSH COMPLETION SYSTEM & PLUGINS
+################################################################
+# This section configures:
+# - Core zsh completion system
+# - FZF (fuzzy finder) and fzf-tab
+# - zsh-autosuggestions (fish-like suggestions)
+# - zsh-syntax-highlighting (optional)
+
+# Initialize completion system
+autoload -Uz compinit
+# Only rebuild completion dump once per day for faster startup
+# Use a more portable approach that works across different systems
+if [[ ! -f ~/.zcompdump ]] || [[ $(find ~/.zcompdump -mtime +1 2>/dev/null) ]]; then
+    compinit
+else
+    compinit -C
+fi
+
+# Basic completion configuration
+zstyle ':completion:*' menu select
+zstyle ':completion:*' matcher-list 'm:{a-zA-Z}={A-Za-z}' 'r:|=*' 'l:|=* r:|=*'
+zstyle ':completion:*' list-colors '${(s.:.)LS_COLORS}'
+zstyle ':completion:*' group-name ''
+zstyle ':completion:*:descriptions' format '%F{yellow}-- %d --%f'
+
+# Plugin directory
+ZSH_CUSTOM="$HOME/.zsh/plugins"
+
+# Load FZF key bindings and fuzzy completion
+# Try homebrew location first
+if [[ -f "$BREW_PREFIX/opt/fzf/shell/completion.zsh" ]]; then
+    source "$BREW_PREFIX/opt/fzf/shell/completion.zsh"
+fi
+if [[ -f "$BREW_PREFIX/opt/fzf/shell/key-bindings.zsh" ]]; then
+    source "$BREW_PREFIX/opt/fzf/shell/key-bindings.zsh"
+fi
+# Fallback to home directory location
+[ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
+
+# Load zsh-autosuggestions
+if [[ -f "$ZSH_CUSTOM/zsh-autosuggestions/zsh-autosuggestions.zsh" ]]; then
+    source "$ZSH_CUSTOM/zsh-autosuggestions/zsh-autosuggestions.zsh"
+    # Performance optimizations
+    ZSH_AUTOSUGGEST_BUFFER_MAX_SIZE="20"
+    ZSH_AUTOSUGGEST_USE_ASYNC=1
+    ZSH_AUTOSUGGEST_STRATEGY=(history completion)
+    # More visible suggestion color (gruvbox-friendly)
+    ZSH_AUTOSUGGEST_HIGHLIGHT_STYLE="fg=241"  # Subtle gray
+    # Key bindings
+    bindkey '^ ' autosuggest-accept      # Ctrl+Space to accept full suggestion
+    bindkey '^E' autosuggest-accept      # Ctrl+E as alternative
+    bindkey '^[[C' forward-word          # Alt+Right to accept partial suggestion
+fi
+
+# Load fzf-tab (must be loaded after compinit but before zsh-syntax-highlighting)
+if [[ -f "$ZSH_CUSTOM/fzf-tab/fzf-tab.plugin.zsh" ]]; then
+    source "$ZSH_CUSTOM/fzf-tab/fzf-tab.plugin.zsh"
+    
+    # Enhanced preview for different file types
+    zstyle ':fzf-tab:complete:*:*' fzf-preview '
+        ([[ -f $realpath ]] && (bat --style=numbers --color=always $realpath || cat $realpath)) ||
+        ([[ -d $realpath ]] && (eza -1 --color=always $realpath || ls -1 --color=always $realpath)) ||
+        echo $realpath
+    '
+    
+    # Git-specific previews
+    zstyle ':fzf-tab:complete:git-checkout:*' fzf-preview '
+        git log --oneline --graph --color=always $word
+    '
+    zstyle ':fzf-tab:complete:git-log:*' fzf-preview '
+        git log --oneline --graph --color=always
+    '
+    
+    # Process previews
+    zstyle ':fzf-tab:complete:kill:*' fzf-preview 'ps -ef | grep -v grep | grep $word'
+    
+    # Better fzf appearance
+    zstyle ':fzf-tab:*' fzf-flags --height=50% --layout=reverse --info=inline
+    
+    # Continuous completion
+    zstyle ':fzf-tab:*' continuous-trigger '/'
+    # Switch between groups with < and >
+    zstyle ':fzf-tab:*' switch-group '<' '>'
+fi
+
+# Load zsh-syntax-highlighting (must be last)
+if [[ -f "$ZSH_CUSTOM/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh" ]]; then
+    source "$ZSH_CUSTOM/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh"
+    # Gruvbox-friendly highlighting colors
+    ZSH_HIGHLIGHT_STYLES[command]='fg=green,bold'
+    ZSH_HIGHLIGHT_STYLES[alias]='fg=green,bold'
+    ZSH_HIGHLIGHT_STYLES[builtin]='fg=yellow'
+    ZSH_HIGHLIGHT_STYLES[path]='fg=blue'
+    ZSH_HIGHLIGHT_STYLES[unknown-token]='fg=red'
+fi
+
+
+################################################################
+# PATH SETTINGS & SHIMS
+################################################################
+# UV SETTINGS
+export PATH="$HOME/.local/bin:$PATH"
+
+# PERL SETTINGS
+PATH="$HOME/.perl5/bin${PATH:+:${PATH}}"; export PATH;
+PERL5LIB="$HOME/.perl5/lib/perl5${PERL5LIB:+:${PERL5LIB}}"; export PERL5LIB;
+PERL_LOCAL_LIB_ROOT="$HOME/.perl5${PERL_LOCAL_LIB_ROOT:+:${PERL_LOCAL_LIB_ROOT}}"; export PERL_LOCAL_LIB_ROOT;
+PERL_MB_OPT="--install_base \"$HOME/.perl5\""; export PERL_MB_OPT;
+PERL_MM_OPT="INSTALL_BASE=$HOME/.perl5"; export PERL_MM_OPT;
+
+# UV & PYENV SETTINGS
+export PYENV_ROOT="$HOME/.pyenv"
+if [[ -d "$PYENV_ROOT" ]]; then
+    command -v pyenv >/dev/null || export PATH="$PYENV_ROOT/bin:$PATH"
+    # Lazy load pyenv for faster shell startup
+    pyenv() {
+        unfunction pyenv
+        eval "$(command pyenv init -)"
+        pyenv "$@"
+    }
+fi
+# Help Pyenv play nice w/Homebrew
+export PYTHON_CONFIGURE_OPTS="--enable-framework"
+
+# Don't alter prompt when venv has been activated
+export VIRTUAL_ENV_DISABLE_PROMPT=1
+
+# Show all active virtual environments
+show_all_venvs() {
+    echo "=== Active Virtual Environments ==="
+    
+    # Show current session's active venv
+    if [[ -n "$VIRTUAL_ENV" ]]; then
+        echo "Current session: $VIRTUAL_ENV"
+    else
+        echo "Current session: None"
+    fi
+    
+    # Find all Python processes and extract their virtual env paths
+    ps aux | grep python | grep -v grep | while read line; do
+        pid=$(echo $line | awk '{print $2}')
+        cmd=$(echo $line | awk '{for(i=11;i<=NF;i++) printf "%s ", $i; print ""}')
+        
+        # Try to get the virtual env from the process environment
+        if [[ -d "/proc/$pid" ]]; then
+            venv_path=$(tr '\0' '\n' < /proc/$pid/environ 2>/dev/null | grep '^VIRTUAL_ENV=' | cut -d= -f2-)
+            if [[ -n "$venv_path" ]]; then
+                echo "PID $pid: $venv_path"
+                echo "  Command: $cmd"
+            fi
+        fi
+    done
+}
+
+# Alternative simpler version - just show available venvs in common locations
+show_available_venvs() {
+    echo "=== Available Virtual Environments ==="
+    
+    # Current session
+    if [[ -n "$VIRTUAL_ENV" ]]; then
+        echo "✅ Active: $VIRTUAL_ENV"
+    fi
+    
+    # Common locations where venvs are stored
+    local search_paths=(
+        "$HOME/.virtualenvs"
+        "$HOME/Projects"
+        "$HOME/Code"
+        "."
+    )
+    
+    for path in "${search_paths[@]}"; do
+        if [[ -d "$path" ]]; then
+            find "$path" -name ".venv" -type d 2>/dev/null | while read venv_dir; do
+                echo "$venv_dir"
+            done
+            find "$path" -path "*/bin/activate" 2>/dev/null | while read activate_script; do
+                venv_dir=$(dirname $(dirname "$activate_script"))
+                if [[ $(basename "$venv_dir") != ".venv" ]]; then
+                    echo "$venv_dir"
+                fi
+            done
+        fi
+    done | sort -u
+}
+
+# Quick alias
+alias venv-list='show_available_venvs'
+alias venv-active='show_all_venvs'
+
+
+# NODE SETTINGS
+export NVM_DIR="$HOME/.nvm"
+# Lazy load nvm for faster shell startup
+if [[ -s "$NVM_DIR/nvm.sh" ]]; then
+    nvm() {
+        unfunction nvm
+        source "$NVM_DIR/nvm.sh"
+        if [[ -s "$NVM_DIR/bash_completion" ]]; then
+            source "$NVM_DIR/bash_completion"
+        fi
+        nvm "$@"
+    }
+    
+    # Also lazy load common node/npm commands
+    node() {
+        unfunction node
+        source "$NVM_DIR/nvm.sh"
+        node "$@"
+    }
+    
+    npm() {
+        unfunction npm
+        source "$NVM_DIR/nvm.sh"
+        npm "$@"
+    }
+fi
+
+################################################################
+# CLOUD CLI TOOLS 
+################################################################
+
+# GOOGLE CLOUD PLATFORM CLI
+if [ -f "$HOME/google-cloud-sdk/path.zsh.inc" ]; then . "$HOME/google-cloud-sdk/path.zsh.inc"; fi
+# Shell command completion for gcloud.
+if [ -f "$HOME/google-cloud-sdk/completion.zsh.inc" ]; then . "$HOME/google-cloud-sdk/completion.zsh.inc"; fi
+
+
+################################################################
+# IDE SETTINGS
+################################################################
+
+# WINDSURF
+export PATH="$HOME/.codeium/windsurf/bin:$PATH"
+
+# VS CODE
+if [[ -f ~/.zsh/vscode.sh ]]; then
+    source ~/.zsh/vscode.sh
+fi

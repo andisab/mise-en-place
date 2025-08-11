@@ -1,0 +1,115 @@
+{
+    "vscode-neovim.neovimExecutablePaths.darwin": "/usr/local/bin/nvim",
+    "vscode-neovim.neovimExecutablePaths.linux": "",
+    "vscode-neovim.neovimExecutablePaths.win32": "",
+    "cloudcode.duetAI.project": "aab-test-project",
+
+    "workbench.colorTheme": "Gruvbox Dark (Hard)",
+    "workbench.settings.applyToAllProfiles": [
+        "genieai.openai.model"
+    ],
+    "settingsSync.ignoredExtensions": [
+        "github.copilot-chat"
+    ],
+    
+    "vim.smartRelativeLine": true,
+    "vim.leader": "<space>",
+    "editor.cursorSurroundingLines": 8,
+    "editor.wordSeparators": "`~!@#$%^&*()=+[{]}|;:',.<>/?", 
+    "vim.cursorStylePerMode.normal": "line",
+    "vim.cursorStylePerMode.insert": "block",
+    "vim.cursorStylePerMode.visual": "block-outline",
+    "vim.cursorStylePerMode.visualblock": "block-outline",
+    "vim.cursorStylePerMode.visualline": "block-outline",
+
+    "vim.statusBarColorControl": true,
+    "vim.statusBarColors.normal": ["#8FBCBB", "#434C5E"],
+    "vim.statusBarColors.insert": "#98971a",
+    "vim.statusBarColors.visual": "#B48EAD",
+    "vim.statusBarColors.visualline": "#B48EAD",
+    "vim.statusBarColors.visualblock": "#B48EAD",
+    "vim.statusBarColors.commandlineinprogress": ["#7D2002", "#ffffff"],
+
+    "vim.searchHighlightColor": "#5E8398",
+    "vim.searchMatchColor": "#81ABC5",
+    "vim.substitutionColor": "#81ABC5",
+    "vim.highlightedyank.enable": true,
+    "vim.highlightedyank.color": "#76b5c5",
+    "vim.highlightedyank.duration": 250,
+    
+    "vim.normalModeKeyBindings": [
+        {
+            "before": ["<leader>", "e"],
+            "commands": ["workbench.view.explorer"]
+        },  
+        {
+            "before": ["g", "p", "d"],
+            "commands": ["editor.action.peekDefinition"]
+        },
+        {
+            "before": ["g", "h"],
+            "commands": ["editor.action.showDefinitionPreviewHover"]
+        },
+        {
+            "before": ["g", "i"],
+            "commands": ["editor.action.goToImplementation"]
+        },
+        {
+            "before": ["g", "p", "i"],
+            "commands": ["editor.action.peekImplementation"]
+        },
+        {
+            "before": ["g", "q"],
+            "commands": ["editor.action.quickFix"]
+        },
+        {
+            "before": ["g", "r"],
+            "commands": ["editor.action.referenceSearch.trigger"]
+        },
+        {
+            "before": ["g", "t"],
+            "commands": ["editor.action.goToTypeDefinition"]
+        },
+        {
+            "before": ["g", "p", "t"],
+            "commands": ["editor.action.peekTypeDefinition"]
+        }
+    ],
+    "vim.insertModeKeyBindings": [
+        {
+            "before": ["k", "j"],
+            "after": ["<Esc>"]
+        },
+        {
+            "key": "ctrl+j",
+            "command": "editor.action.cursorDown"
+        },
+        {
+            "before": ["<C-k"],
+            "commands": ["editor.action.cursorUp"]
+        },
+        {
+            "before": ["<C-h"],
+            "commands": ["editor.action.cursorLeft"]
+        },
+        {
+            "before": ["<C-l"],
+            "after": ["editor.action.cursorRight"]
+        }
+    ],  
+    "vim.visualModeKeyBindings": [
+        {
+            "before": ["k", "j"],
+            "after": ["<Esc>"]
+        }
+    ],
+    "vim.commandLineModeKeyBindings": [
+    ],
+    "workbench.colorCustomizations": {
+        "statusBar.background": "#B48EAD",
+        "statusBar.noFolderBackground": "#B48EAD",
+        "statusBar.debuggingBackground": "#B48EAD",
+        "statusBar.foreground": "#434C5E",
+        "statusBar.debuggingForeground": "#434C5E"
+    }
+}
