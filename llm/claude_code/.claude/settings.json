@@ -1,0 +1,13 @@
+{
+  "statusLine": {
+    "type": "command",
+    "command": "bun x ccusage statusline"
+  },
+  "permissions": {
+    "allow": [
+      "bash:*:ls*",
+      "bash:*:grep*",
+      "bash:*:find*"
+    ]
+  }
+}
