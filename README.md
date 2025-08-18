@@ -1,10 +1,10 @@
 # Mise-en-Place - Dotfiles Management Framework
 
-A macOS dotfiles configuration management system with centralized sync and modern tooling. 
+This repository was built to be a slightly more fully-featured-than-average framework for managing personal dotfiles with sync and modern tooling. I have used and evolved it over the years for personal use, but recently made a variant of it public as a good alternative for Claude Code & Claude Desktop initial setup & version control. My hope is that it will help others get from "clueless beginner" to somewhat proficient w/Claude Code fairly quickly. If you have a really solid setup and something to contribute, PR's are welcome & appreciated. Enjoy! 
 
 ## Overview
 
-This repository provides a framework for managing configuration files across multiple applications and development tools using a hybrid Python + Shell approach for maximum compatibility and maintainability. It is configured for macOS systems, but can be adapted for other Unix-based systems. It is intended to be simple and intuitive to use with very deterministic results. Use it to get your IDE or LLM config set up quickly & easily. 
+This repository provides a framework for managing configuration files across multiple applications and development tools using a hybrid Python + Shell approach for maximum compatibility and maintainability. It is configured for macOS systems, but can be adapted for most any system that will run Python & shell. It is intended to be simple and intuitive to use with very deterministic results. 
 
 **Key Features:**
 - 🔄 Bidirectional sync between repository and system
@@ -47,7 +47,7 @@ cd mise-en-place
 
 # That's it. You should be good to go! 
 ```
-The quick install handles everything automatically. For manual control or customization, follow these steps instead: 
+The quick install should handle everything automatically. For manual control or customization, follow these steps instead: 
 
 
 ## Manual Setup (Advanced)
