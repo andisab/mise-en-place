@@ -1,13 +1,27 @@
 {
-  "statusLine": {
-    "type": "command",
-    "command": "bun x ccusage statusline"
+  "$schema": "https://json.schemastore.org/claude-code-settings.json",
+  "model": "opus",
+  "feedbackSurveyState": {
+    "lastShownTime": 1754005635052
+  },
+  "hooks": {
+    "session-start": "python3 ~/.claude/hooks/session-start.py"
   },
   "permissions": {
     "allow": [
-      "bash:*:ls*",
-      "bash:*:grep*",
-      "bash:*:find*"
-    ]
+      "Bash(find:*)",
+      "Bash(ls:*)",
+      "WebFetch(domain:github.com)",
+      "WebFetch(domain:raw.githubusercontent.com)",
+      "WebFetch(domain:api.github.com)",
+      "Bash(docker-compose logs:*)",
+      "mcp__Context7__resolve-library-id",
+      "mcp__Context7__get-library-docs",
+      "mcp__memory__delete_entities",
+      "mcp__memory__search_nodes",
+      "mcp__memory__open_nodes",
+      "mcp__memory__add_observations"
+    ],
+    "deny": []
   }
 }

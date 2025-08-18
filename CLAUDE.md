@@ -2,7 +2,7 @@
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
 ## Project Status Summary & To Do's
-**Updated**: *August 11th, 2025*
+**Updated**: *August 17th, 2025*
 
 **Current Status**: Self-maintaining dotfiles system with comprehensive security and template processing
 - ✅ Quick install automation
@@ -10,7 +10,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - ✅ Interactive diff/merge functionality
 - ✅ Custom overlay features for highly personalized configurations
 - ✅ Automated environment template processing with validation and error handling
-- ✅ **Security Hardening Complete** (February 2025):
+- ✅ **Security Hardening Complete** (August 2025):
   - Fixed shell injection vulnerabilities with proper subprocess handling
   - Added environment file validation to prevent malicious code execution
   - Implemented secure temporary file operations with atomic updates
@@ -19,6 +19,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
   - Enhanced POSIX compliance across all shell variants
 
 **To Do**: Framework mature - focusing on expansion and polish
+- 🔧 **Add Uninstall Script**: Implement an uninstall script to revert changes made by the installation process
 - ✨ **Config/LLM Context To Add**: Expand command library and IDE support
   - Add more common AI development tasks to /commands directory
   - Refine existing /commands for better functionality
@@ -30,7 +31,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Repository Overview
 
-This is a dotfiles repository template for macOS that manages configuration files across multiple tools and applications. The repository uses a **hybrid Python + Shell architecture** for maximum compatibility and maintainability across different macOS versions and shells. It is theoretically extensible to other operating systems as well. 
+This is a dotfiles repository template for macOS that manages configuration files across multiple tools and applications. The repository uses a **hybrid Python + Shell architecture** for maximum compatibility and maintainability across different macOS versions and shells. It is theoretically extensible to other operating systems as well.
 
 ## Core Architecture
 
@@ -186,7 +187,7 @@ validate_config
 - **config_parser.py**: Python parser with command-line interface, validation, and diff/merge functionality
 - **install.sh**: Shell functions for file operations and system integration (no changes needed!)
 
-### Shell Configuration  
+### Shell Configuration
 - Shell configurations are not managed by default
 - Users can use the custom overlay feature to manage their own shell configs
 - The framework focuses on LLM and IDE configurations

@@ -56,6 +56,9 @@ llm/claude_desktop/claude_desktop_config.json
 # User's secrets file (never commit this!)
 .claude_secrets
 
+# Claude Code local settings
+llm/claude_code/.claude/commands/.claude/
+
 # Python
 __pycache__/
 *.py[cod]
